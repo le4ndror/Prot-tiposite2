@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Laboratório - Eletricidade</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+/* ================= ESTRUTURA GLOBAL ================= */
+:root {
+    --primary-color: #10b981; 
+    --primary-hover: #059669;
+    --bg-color: #f0fdf4; 
+    --surface-color: #ffffff;
+    --text-main: #111827;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --danger-color: #ef4444;
+    --success-color: #10b981;
+}
+
+*{ box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================= ÁREA CENTRAL (CARD CORPORATIVO) ================= */
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.card {
+    background: var(--surface-color);
+    border-radius: 12px;
+    padding: 48px;
+    width: 100%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+    animation: fadeIn 0.4s ease-in-out;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.card::-webkit-scrollbar { width: 6px; }
+.card::-webkit-scrollbar-track { background: transparent; }
+.card::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 { font-weight: 600; font-size: 1.7rem; margin-bottom: 8px; color: var(--text-main); }
+h2 { font-weight: 400; font-size: 1.1rem; margin-top: 0; margin-bottom: 30px; color: var(--text-muted); }
+.desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px; }
+.mini-desc { color: var(--text-muted); font-size: 0.8rem; margin-top: -4px; margin-bottom: 12px; display: block; }
+
+/* ================= BOTÕES E INPUTS ================= */
+button, input, select {
+    width: 100%;
+    padding: 14px 16px;
+    margin: 8px 0;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    outline: none;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+input, select {
+    background: #f9fafb;
+    color: var(--text-main);
+}
+
+input:focus, select:focus {
+    background: var(--surface-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+button {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+button:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+button:active { transform: translateY(0); }
+
+.btn-voltar, .btn-secundario {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    box-shadow: none;
+}
+.btn-voltar:hover, .btn-secundario:hover { background-color: #f3f4f6; box-shadow: none; }
+
+.btn-perigo { background-color: var(--danger-color); color: white; }
+.btn-perigo:hover { background-color: #dc2626; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
+
+.tela { display: none; }
+.ativa { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+/* ================= GRID DE ESCOLHAS ================= */
+.grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.module-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(16, 185, 129, 0.15);
+    border-color: var(--primary-color);
+}
+
+.module-img {
+    height: 120px;
+    background-color: #e5e7eb;
+    background-size: cover;
+    background-position: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.module-title { padding: 16px 10px; font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
+.botoes-rodape { display: flex; gap: 12px; margin-top: 20px; }
+
+/* ================= GRUPOS E REGISTROS ================= */
+.grupo, .registro {
+    background: #f9fafb;
+    padding: 20px;
+    margin: 16px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: left;
+}
+
+.registro strong { color: var(--text-main); font-weight: 600; }
+.status-ok { color: var(--success-color); font-weight: 600; }
+.status-erro { color: var(--danger-color); font-weight: 600; }
+
+hr { border: 0; border-top: 1px solid var(--border-color); margin: 30px 0; }
+.divisor-escuro { border-top: 1px dashed var(--border-color); margin: 16px 0; }
+.flex-row { display: flex; gap: 10px; margin-top: 8px; }
+
+/* ================= RESISTOR DINÂMICO ================= */
+.resistor-dinamico {
+    position: relative;
+    width: 320px;
+    height: 70px;
+    margin: 40px auto;
+    background: #e1c699;
+    border-radius: 8px;
+    border: 1px solid #c8a873;
+}
+.resistor-dinamico::before, .resistor-dinamico::after { content: ""; position: absolute; width: 80px; height: 8px; background: #9ca3af; top: 31px; }
+.resistor-dinamico::before { left: -80px; } .resistor-dinamico::after { right: -80px; }
+.faixa-dinamica { position: absolute; width: 14px; height: 100%; }
+#c_f1 { left: 50px; } #c_f2 { left: 90px; } #c_f3 { left: 130px; } #c_f4 { left: 180px; } #c_f5 { left: 250px; }
+
+@media(max-width: 768px) {
+    .container { padding: 10px; width: 100%; }
+    .card { padding: 24px; max-height: 100vh; border-radius: 8px; }
+    .botoes-rodape { flex-direction: column; }
+    .grid-cards { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="card">
+
+<div id="inicio" class="tela ativa">
+    <h1>Instituto Federal</h1>
+    <h2>Laboratório de Eletricidade</h2>
+    <div style="max-width: 400px; margin: 0 auto;">
+        <button onclick="mostrarTela('loginProfessor')">Portal do Professor</button>
+        <button class="btn-secundario" onclick="mostrarTela('loginGrupo')">Acesso de Alunos</button>
+    </div>
+</div>
+
+<div id="loginProfessor" class="tela">
+    <div style="max-width: 400px; margin: 0 auto;">
+        <h1>Acesso Institucional</h1>
+        <p class="desc">Insira a credencial do professor para visualizar as métricas.</p>
+        <input type="password" id="senhaProfessor" placeholder="Senha de acesso">
+        <button onclick="entrarProfessor()">Autenticar</button>
+        <button onclick="mostrarTela('inicio')" class="btn-voltar">Voltar</button>
+    </div>
+</div>
+
+<div id="menuProfessor" class="tela">
+    <h1>Painel de Controle</h1>
+    <p class="desc">Selecione o módulo para visualizar as medições enviadas pelos grupos.</p>
+    
+    <div class="grid-cards">
+        <div class="module-card" onclick="mostrarRegistros('Série')"><div class="module-img" style="background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=80')"></div><div class="module-title">Resistores em Série</div></div>
+        <div class="module-card" onclick="mostrarRegistros('Paralelo')"><div class="module-img" style="background-image: url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=400&q=80')"></div><div class="module-title">Resistores em Paralelo</div></div>
+        <div class="module-card" onclick="mostrarRegistros('Misto')"><div class="module-img" style="background-image: url('https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&w=400&q=80')"></div><div class="module-title">Circuito Misto</div></div>
+        <div class="module-card" onclick="mostrarRegistros('Divisor de Tensão')"><div class="module-img" style="background-image: url('https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=400&q=80')"></div><div class="module-title">Divisor de Tensão</div></div>
+        <div class="module-card" onclick="mostrarRegistros('Divisor de Corrente')"><div class="module-img" style="background-image: url('https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?auto=format&fit=crop&w=400&q=80')"></div><div class="module-title">Divisor de Corrente</div></div>
+        <div class="module-card" onclick="mostrarRegistros('Análise Nodal')"><div class="module-img" style="background-image: url('https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=400&q=80')"></div><div class="module-title">Análise Nodal</div></div>
+        <div class="module-card" onclick="mostrarRegistros('Cores')"><div class="module-img" style="background-image: url('https://images.unsplash.com/photo-1635874495754-06c27e80eb83?auto=format&fit=crop&w=400&q=80')"></div><div class="module-title">Código de Cores</div></div>
+    </div>
+    
+    <hr>
+    <button onclick="mostrarTela('inicio')" class="btn-voltar" style="max-width: 300px; margin: 0 auto; display: block;">Encerrar Sessão</button>
+</div>
+
+<div id="listaProfessor" class="tela">
+    <h1 id="tituloListaProfessor">Registros do Laboratório</h1>
+    <div id="listaRegistros"></div>
+    <button onclick="mostrarTela('menuProfessor')" class="btn-voltar" style="max-width: 300px; margin: 20px auto 0; display: block;">Retornar ao Painel</button>
+</div>
+
+<div id="loginGrupo" class="tela">
+    <div style="max-width: 400px; margin: 0 auto;">
+        <h1>Acesso do Grupo</h1>
+        <p class="desc">Identifique seu grupo de bancada para iniciar a atividade.</p>
+        <input type="text" id="nomeGrupo" placeholder="Identificação (ex: Grupo A)">
+        <input type="password" id="senhaGrupo" placeholder="Senha do Grupo">
+        <button onclick="entrarGrupo()">Acessar Bancada</button>
+        <button onclick="mostrarTela('inicio')" class="btn-voltar">Voltar</button>
+    </div>
+</div>
+
+<div id="escolhaGrupo" class="tela">
+    <h1>Módulos de Atividade</h1>
+    <p class="desc">Selecione a prática laboratorial a ser reportada.</p>
+    
+    <div class="grid-cards">
+        <div class="module-card" onclick="abrirAtividade('serie')"><div class="module-title">Resistores em Série</div></div>
+        <div class="module-card" onclick="abrirAtividade('paralelo')"><div class="module-title">Resistores em Paralelo</div></div>
+        <div class="module-card" onclick="abrirAtividade('misto')"><div class="module-title">Circuito Misto</div></div>
+        <div class="module-card" onclick="abrirAtividade('divisorTensao')"><div class="module-title">Divisor de Tensão</div></div>
+        <div class="module-card" onclick="abrirAtividade('divisorCorrente')"><div class="module-title">Divisor de Corrente</div></div>
+        <div class="module-card" onclick="abrirAtividade('analiseNodal')"><div class="module-title">Análise Nodal</div></div>
+        <div class="module-card" onclick="abrirAtividade('cores')"><div class="module-title">Código de Cores</div></div>
+    </div>
+    
+    <hr>
+    <div class="botoes-rodape">
+        <button onclick="mostrarResultadosGrupo()" class="btn-secundario">Consultar Avaliações</button>
+        <button onclick="mostrarTela('loginGrupo')" class="btn-voltar">Sair da Sessão</button>
+    </div>
+</div>
+
+<div id="serie" class="tela">
+    <h1>Associação em Série</h1>
+    <input type="text" id="serieValores" placeholder="Valores base. Ex: 10, 20, 30">
+    <hr><p class="desc" style="font-weight:500;">Dados do Multímetro:</p>
+    <input type="number" id="nomSerie" placeholder="1. Resistência Nominal (Ω)">
+    <input type="number" id="medSerie" placeholder="2. Resistência Medida (Ω)">
+    <input type="number" id="deltaSerie" placeholder="3. Erro Relativo - ΔR (%)">
+    <div class="botoes-rodape"><button onclick="enviarExercicio('Série')">Submeter</button><button onclick="mostrarTela('escolhaGrupo')" class="btn-voltar">Cancelar</button></div>
+</div>
+
+<div id="paralelo" class="tela">
+    <h1>Associação em Paralelo</h1>
+    <input type="text" id="paraleloValores" placeholder="Valores base. Ex: 10, 20, 30">
+    <hr><p class="desc" style="font-weight:500;">Dados do Multímetro:</p>
+    <input type="number" id="nomParalelo" placeholder="1. Resistência Nominal (Ω)">
+    <input type="number" id="medParalelo" placeholder="2. Resistência Medida (Ω)">
+    <input type="number" id="deltaParalelo" placeholder="3. Erro Relativo - ΔR (%)">
+    <div class="botoes-rodape"><button onclick="enviarExercicio('Paralelo')">Submeter</button><button onclick="mostrarTela('escolhaGrupo')" class="btn-voltar">Cancelar</button></div>
+</div>
+
+<div id="misto" class="tela">
+    <h1>Circuito Misto</h1>
+    <div id="grupos"></div><button onclick="adicionarGrupo()" class="btn-secundario" style="border-style: dashed;">+ Adicionar Bloco</button>
+    <hr><p class="desc" style="font-weight:500;">Dados Totais:</p>
+    <input type="number" id="nomMisto" placeholder="1. Resistência Nominal Total (Ω)">
+    <input type="number" id="medMisto" placeholder="2. Resistência Medida Total (Ω)">
+    <input type="number" id="deltaMisto" placeholder="3. Erro Relativo Total - ΔR (%)">
+    <div class="botoes-rodape"><button onclick="enviarExercicio('Misto')">Submeter</button><button onclick="mostrarTela('escolhaGrupo')" class="btn-voltar">Cancelar</button></div>
+</div>
+
+<div id="divisorTensao" class="tela">
+    <h1>Divisor de Tensão</h1>
+    <input type="number" id="dtVin" placeholder="Tensão da Fonte - Vin (V)"><input type="number" id="dtRloc" placeholder="Resistência Localizada - Rloc (Ω)"><input type="number" id="dtReq" placeholder="Resistência Equivalente - Req (Ω)">
+    <hr><p class="desc" style="font-weight:500;">Dados do Multímetro (Tensão no Resistor Localizado):</p>
+    <input type="number" id="nomDivisorTensao" placeholder="1. Tensão Nominal Calculada - Vloc (V)">
+    <input type="number" id="medDivisorTensao" placeholder="2. Tensão Medida - Vloc (V)">
+    <input type="number" id="deltaDivisorTensao" placeholder="3. Erro Relativo - ΔV (%)">
+    <div class="botoes-rodape"><button onclick="enviarExercicio('Divisor de Tensão')">Submeter</button><button onclick="mostrarTela('escolhaGrupo')" class="btn-voltar">Cancelar</button></div>
+</div>
+
+<div id="divisorCorrente" class="tela">
+    <h1>Divisor de Corrente</h1>
+    <input type="number" id="dcIin" placeholder="Corrente Total da Fonte - Iin (mA)"><input type="number" id="dcRloc" placeholder="Resistência Localizada - Rloc (Ω)"><input type="number" id="dcReq" placeholder="Resistência Equivalente - Req (Ω)">
+    <hr><p class="desc" style="font-weight:500;">Dados do Multímetro (Corrente no Resistor Localizado):</p>
+    <input type="number" id="nomDivisorCorrente" placeholder="1. Corrente Nominal Calculada - Iloc (mA)">
+    <input type="number" id="medDivisorCorrente" placeholder="2. Corrente Medida - Iloc (mA)">
+    <input type="number" id="deltaDivisorCorrente" placeholder="3. Erro Relativo - ΔI (%)">
+    <div class="botoes-rodape"><button onclick="enviarExercicio('Divisor de Corrente')">Submeter</button><button onclick="mostrarTela('escolhaGrupo')" class="btn-voltar">Cancelar</button></div>
+</div>
+
+<div id="cores" class="tela">
+    <h1>Código de Cores</h1>
+    <div class="resistor-dinamico">
+        <div class="faixa-dinamica" id="c_f1"></div><div class="faixa-dinamica" id="c_f2"></div><div class="faixa-dinamica" id="c_f3"></div><div class="faixa-dinamica" id="c_f4"></div><div class="faixa-dinamica" id="c_f5"></div>
+    </div>
+    <select id="tipo"><option value="4">Padrão 4 Faixas</option><option value="5">Padrão 5 Faixas</option></select>
+    <div style="display:flex; gap:10px;"><select id="faixa1"></select><select id="faixa2"></select><select id="faixa3"></select></div>
+    <div style="display:flex; gap:10px;"><select id="multiplicador"></select><select id="tolerancia"></select></div>
+    <hr><input type="number" id="nomCores" placeholder="1. Valor Nominal (Ω)"><input type="number" id="medCores" placeholder="2. Valor Medido (Ω)"><input type="number" id="deltaCores" placeholder="3. Erro Relativo - ΔR (%)">
+    <div class="botoes-rodape"><button onclick="enviarExercicio('Cores')">Submeter</button><button onclick="mostrarTela('escolhaGrupo')" class="btn-voltar">Cancelar</button></div>
+</div>
+
+<div id="analiseNodal" class="tela">
+    <h1>Análise Nodal</h1>
+    <p class="desc">Defina os parâmetros do circuito para cálculos dos nós e avaliação das margens de erro (ΔR).</p>
+    
+    <label style="font-weight:600; color:var(--text-main);">Quantos nós tem o circuito?</label>
+    <select id="anQtdNosSelect" onchange="mudarNosNodal()">
+        <option value="1">1 Nó (Va)</option>
+        <option value="2">2 Nós (Va e Vb)</option>
+    </select>
+
+    <div class="grupo" id="blocoVaMain">
+        <strong>Parâmetros Nó A (Va)</strong>
+        <div class="flex-row">
+            <input type="number" id="vr1" step="any" placeholder="Tensão Vr1 (V)"><input type="number" id="r1" step="any" placeholder="Resistor R1 (Ω)">
+        </div>
+        <div class="flex-row">
+            <input type="number" id="vr2" step="any" placeholder="Tensão Vr2 (V)"><input type="number" id="r2" step="any" placeholder="Resistor R2 (Ω)">
+        </div>
+        <div class="flex-row">
+            <input type="number" id="vr3" step="any" placeholder="Tensão Vr3 (V)"><input type="number" id="r3" step="any" placeholder="Resistor R3 (Ω)">
+        </div>
+    </div>
+
+    <div class="grupo" id="blocoVbMain" style="display:none;">
+        <strong>Parâmetros Nó B (Vb)</strong>
+        <div class="flex-row">
+            <input type="number" id="vr4" step="any" placeholder="Tensão Vr4 (V)"><input type="number" id="r4" step="any" placeholder="Resistor R4 (Ω)">
+        </div>
+        <div class="flex-row">
+            <input type="number" id="vr5" step="any" placeholder="Tensão Vr5 (V)"><input type="number" id="r5" step="any" placeholder="Resistor R5 (Ω)">
+        </div>
+        <div class="flex-row">
+            <input type="number" id="vr6" step="any" placeholder="Tensão Vr6 (V)"><input type="number" id="r6" step="any" placeholder="Resistor R6 (Ω)">
+        </div>
+    </div>
+
+    <hr>
+    
+    <p class="desc" style="font-weight:600; color:var(--text-main); margin-bottom: 0;">Medições do Grupo (Tensões e Correntes)</p>
+    <span class="mini-desc">Insira a leitura base e medida para o sistema avaliar a conformidade do seu Erro Relativo (Δ).</span>
+    
+    <div class="grupo">
+        <strong>Tensões Nodais</strong>
+        <div class="flex-row" style="margin-top:10px;">
+            <input type="number" id="va_nom" step="any" placeholder="Va Nominal">
+            <input type="number" id="va_med" step="any" placeholder="Va Medido">
+            <input type="number" id="va_delta" step="any" placeholder="ΔR Va (%)">
+        </div>
+        <div class="flex-row" id="medicoesVbMain" style="display:none;">
+            <input type="number" id="vb_nom" step="any" placeholder="Vb Nominal">
+            <input type="number" id="vb_med" step="any" placeholder="Vb Medido">
+            <input type="number" id="vb_delta" step="any" placeholder="ΔR Vb (%)">
+        </div>
+    </div>
+
+    <div class="grupo">
+        <strong>Correntes dos Ramos (I)</strong>
+        <div class="flex-row"><input type="number" id="i1_nom" step="any" placeholder="I1 Nom"><input type="number" id="i1_med" step="any" placeholder="I1 Med"><input type="number" id="i1_delta" step="any" placeholder="ΔR I1 (%)"></div>
+        <div class="flex-row"><input type="number" id="i2_nom" step="any" placeholder="I2 Nom"><input type="number" id="i2_med" step="any" placeholder="I2 Med"><input type="number" id="i2_delta" step="any" placeholder="ΔR I2 (%)"></div>
+        <div class="flex-row"><input type
